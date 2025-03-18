@@ -1,36 +1,31 @@
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, count
+from pyspark.sql import SparkSession 
+from pyspark.sql.functions import col, count, lit
 
 def initialize_spark(app_name="Task2_Churn_Risk_Users"):
     """
     Initialize and return a SparkSession.
     """
-    spark = SparkSession.builder \
-        .appName(app_name) \
-        .getOrCreate()
+    spark = SparkSession.builder.appName(app_name).getOrCreate()
     return spark
 
 def load_data(spark, file_path):
     """
     Load the movie ratings data from a CSV file into a Spark DataFrame.
     """
-    schema = """
-        UserID INT, MovieID INT, MovieTitle STRING, Genre STRING, Rating FLOAT, ReviewCount INT, 
-        WatchedYear INT, UserLocation STRING, AgeGroup STRING, StreamingPlatform STRING, 
-        WatchTime INT, IsBingeWatched BOOLEAN, SubscriptionStatus STRING
-    """
-    df = spark.read.csv(file_path, header=True, schema=schema)
+    df = spark.read.csv(file_path, header=True, inferSchema=True)
     return df
 
 def identify_churn_risk_users(df):
     """
     Identify users with canceled subscriptions and low watch time (<100 minutes).
-
-    TODO: Implement the following steps:
-    1. Filter users where `SubscriptionStatus = 'Canceled'` AND `WatchTime < 100`.
-    2. Count the number of such users.
     """
-    pass  # Remove this line after implementation
+    churn_risk_df = df.filter((col("SubscriptionStatus") == "Canceled") & (col("WatchTime") < 100))
+    churn_risk_users= churn_risk_df.agg(count("UserID").alias("Total Users"))
+    
+    # Adding the required label column
+    churn_risk_users = churn_risk_users.withColumn("Churn Risk Users", lit("Users with low watch time & canceled subscriptions"))
+    
+    return churn_risk_users.select("Churn Risk Users", "Total Users")
 
 def write_output(result_df, output_path):
     """
@@ -43,15 +38,15 @@ def main():
     Main function to execute Task 2.
     """
     spark = initialize_spark()
-
-    input_file = "/workspaces/MovieRatingsAnalysis/input/movie_ratings_data.csv"
-    output_file = "/workspaces/MovieRatingsAnalysis/outputs/churn_risk_users.csv"
-
+    input_file = "input/movie_ratings_data.csv"  # Updated path based on your directory structure
     df = load_data(spark, input_file)
-    result_df = identify_churn_risk_users(df)  # Call function here
-    write_output(result_df, output_file)
-
+    
+    # Task 2: Identify Churn Risk Users
+    churn_result = identify_churn_risk_users(df)
+    write_output(churn_result, "Outputs/churn_risk_users.csv")
+    
     spark.stop()
 
 if __name__ == "__main__":
     main()
+

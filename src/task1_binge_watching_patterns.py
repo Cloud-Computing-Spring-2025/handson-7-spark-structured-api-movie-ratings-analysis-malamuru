@@ -5,34 +5,26 @@ def initialize_spark(app_name="Task1_Binge_Watching_Patterns"):
     """
     Initialize and return a SparkSession.
     """
-    spark = SparkSession.builder \
-        .appName(app_name) \
-        .getOrCreate()
+    spark = SparkSession.builder.appName(app_name).getOrCreate()
     return spark
 
 def load_data(spark, file_path):
     """
     Load the movie ratings data from a CSV file into a Spark DataFrame.
     """
-    schema = """
-        UserID INT, MovieID INT, MovieTitle STRING, Genre STRING, Rating FLOAT, ReviewCount INT, 
-        WatchedYear INT, UserLocation STRING, AgeGroup STRING, StreamingPlatform STRING, 
-        WatchTime INT, IsBingeWatched BOOLEAN, SubscriptionStatus STRING
-    """
-    df = spark.read.csv(file_path, header=True, schema=schema)
+    df = spark.read.csv(file_path, header=True, inferSchema=True)
     return df
 
 def detect_binge_watching_patterns(df):
     """
     Identify the percentage of users in each age group who binge-watch movies.
-
-    TODO: Implement the following steps:
-    1. Filter users who have `IsBingeWatched = True`.
-    2. Group by `AgeGroup` and count the number of binge-watchers.
-    3. Count the total number of users in each age group.
-    4. Calculate the binge-watching percentage for each age group.
     """
-    pass  # Remove this line after implementation
+    binge_watchers_df = df.filter(col("IsBingeWatched") == True)
+    binge_counts = binge_watchers_df.groupBy("AgeGroup").agg(count("UserID").alias("Binge Watchers"))
+    total_users = df.groupBy("AgeGroup").agg(count("UserID").alias("Total Users"))
+    binge_watch_summary = binge_counts.join(total_users, "AgeGroup")\
+        .withColumn("Percentage", spark_round((col("Binge Watchers") / col("Total Users")) * 100, 2))
+    return binge_watch_summary
 
 def write_output(result_df, output_path):
     """
@@ -45,14 +37,13 @@ def main():
     Main function to execute Task 1.
     """
     spark = initialize_spark()
-
-    input_file = "/workspaces/MovieRatingsAnalysis/input/movie_ratings_data.csv"
-    output_file = "/workspaces/MovieRatingsAnalysis/outputs/binge_watching_patterns.csv"
-
+    input_file = "input/movie_ratings_data.csv"  # Updated path based on your directory structure
     df = load_data(spark, input_file)
-    result_df = detect_binge_watching_patterns(df)  # Call function here
-    write_output(result_df, output_file)
-
+    
+    # Task 1: Binge Watching Patterns
+    binge_result = detect_binge_watching_patterns(df)
+    write_output(binge_result, "Outputs/binge_watching_patterns.csv")
+    
     spark.stop()
 
 if __name__ == "__main__":
