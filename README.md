@@ -23,12 +23,7 @@ Before starting the assignment, ensure you have the following software installed
      ```bash
      spark-submit --version
      ```
-
-4. **Docker & Docker Compose** (Optional):
-   - If you prefer using Docker for setting up Spark, ensure Docker and Docker Compose are installed.
-   - [Docker Installation Guide](https://docs.docker.com/get-docker/)
-   - [Docker Compose Installation Guide](https://docs.docker.com/compose/install/)
-
+     
 ## **Setup Instructions**
 
 ### **1. Project Structure**
@@ -50,12 +45,6 @@ MovieRatingsAnalysis/
 ├── docker-compose.yml
 └── README.md
 ```
-
-
-
-
-
-
 
 
 
@@ -93,29 +82,6 @@ You can run the analysis tasks either locally or using Docker.
    - `churn_risk_users.csv`
    - `movie_watching_trends.csv`
 
-#### **b. Running with Docker (Optional)**
-
-1. **Start the Spark Cluster**:
-   ```bash
-   docker-compose up -d
-   ```
-
-2. **Access the Spark Master Container**:
-   ```bash
-   docker exec -it spark-master bash
-   ```
-
-3. **Navigate to the Spark Directory**:
-   ```bash
-   cd /opt/bitnami/spark/
-   ```
-
-4. **Run Your PySpark Scripts Using `spark-submit`**:
-   ```bash
-   spark-submit src/task1_binge_watching_patterns.py
-   spark-submit src/task2_churn_risk_users.py
-   spark-submit src/task3_movie_watching_trends.py
-   ```
 
 5. **Exit the Container**:
    ```bash
@@ -132,7 +98,7 @@ You can run the analysis tasks either locally or using Docker.
 
 ## **Overview**
 
-In this assignment, you will leverage Spark Structured APIs to analyze a dataset containing employee information from various departments within an organization. Your goal is to extract meaningful insights related to employee satisfaction, engagement, concerns, and job titles. This exercise is designed to enhance your data manipulation and analytical skills using Spark's powerful APIs.
+In this assignment, we has leverage Spark Structured APIs to analyze a dataset containing employee information from various departments within an organization. we have extracted meaningful insights related to employee satisfaction, engagement, concerns, and job titles. This exercise is designed to enhanced data manipulation and analytical skills using Spark's powerful APIs.
 
 ## **Objectives**
 
@@ -184,7 +150,6 @@ UserID,MovieID,MovieTitle,Genre,Rating,ReviewCount,WatchedYear,UserLocation,AgeG
 
 ## **Assignment Tasks**
 
-You are required to complete the following three analysis tasks using Spark Structured APIs. Ensure that your analysis is well-documented, with clear explanations and any relevant visualizations or summaries.
 
 ### **1. Identify Departments with High Satisfaction and Engagement**
 
@@ -199,16 +164,21 @@ Determine which movies have an average watch time greater than 100 minutes and r
 - **Identify Top Movies**: List movies where the average watch time is among the highest.
 
 
-**Expected Outcome:**
+**Outcome:**
 
 A list of departments meeting the specified criteria, along with the corresponding percentages.
 
-**Example Output:**
+**Output:**
 
-| Age Group   | Binge Watchers | Percentage |
-|-------------|----------------|------------|
-| Teen        | 195            | 45%        |
-| Adult       | 145            | 38%        |
+| Age Group   | Binge Watchers | Total Users  |Percentage |
+|-------------|----------------|--------------|-----------|
+| Senior      | 14             | 33           | 42.42%    |
+| Teen        | 20             | 38           | 52.63%    |
+| Adult       | 19             | 29           | 65.52%    |
+
+Findings: 
+- Teenagers have the highest binge-watching percentage.
+- Seniors follow closely, while Adults binge-watch the least.
 
 ---
 
@@ -224,18 +194,20 @@ Find users who are **at risk of churn** by identifying those with **canceled sub
 - **Analyze Watch Time**: Identify users with `WatchTime < 100` minutes.  
 - **Count At-Risk Users**: Compute the total number of such users.  
 
-**Expected Outcome:**  
+**Outcome:**  
 
 A count of users who **canceled their subscriptions and had low engagement**, highlighting **potential churn risks**.
 
-**Example Output:**  
+**Output:**  
 
 
 |Churn Risk Users                                  |	Total Users |
 |--------------------------------------------------|--------------|
-|Users with low watch time & canceled subscriptions|	350         |
+|Users with low watch time & canceled subscriptions|	13          |
 
-
+Findings:
+- A significant percentage of users with low watch time tend to cancel subscriptions.
+- Identifying these users can help with targeted retention strategies.
 
 ---
 
@@ -251,42 +223,24 @@ Analyze how **movie-watching trends** have changed over the years and find peak 
 - **Analyze Trends**: Identify patterns and compare year-over-year growth in movie consumption.  
 - **Find Peak Years**: Highlight the years with the highest number of movies watched.  
 
-**Expected Outcome:**  
+** Outcome:**  
 
 A summary of **movie-watching trends** over the years, indicating peak years for streaming activity.
 
-**Example Output:**  
+**Output:**  
 
 | Watched Year | Movies watched |
 |--------------|----------------|
-| 2020         | 1200           |
-| 2021         | 1500           |
-| 2022         | 2100           |
-| 2023         | 2800           |
+| 2018         | 21             |
+| 2019         | 21             |
+| 2020         | 13             |
+| 2021         | 21             |
+| 2022         | 10             |
+| 2023         | 14             |
 
-
----
-
-## **Grading Criteria**
-
-Your assignment will be evaluated based on the following criteria:
-
-- **Question 1**: Correct identification of departments with over 50% high satisfaction and engagement (1 mark).
-- **Question 2**: Accurate analysis of employees who feel valued but didn’t suggest improvements, including proportion (1 mark).
-- **Question 3**: Proper comparison of engagement levels across job titles and correct identification of the top-performing job title (1 mark).
-
-**Total Marks: 3**
+Findings:
+- Movie consumption has decreased year-over-year.
+- 2018,2019,2021 had the highest number of movies watched.
 
 ---
 
-## **Submission Guidelines**
-
-- **Code**: Submit all your PySpark scripts located in the `src/` directory.
-- **Report**: Include a report summarizing your findings for each task. Ensure that your report is well-structured, with clear headings and explanations.
-- **Data**: Ensure that the `movie_ratings_data.csv` used for analysis is included in the `data/` directory or provide a script for data generation if applicable.
-- **Format**: Submit your work in a zipped folder containing all necessary files.
-- **Deadline**: [Insert Deadline Here]
-
----
-
-Good luck, and happy analyzing!
